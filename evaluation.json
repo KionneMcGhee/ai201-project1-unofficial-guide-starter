@@ -1,0 +1,46 @@
+[
+  {
+    "question": "Which room did the 2023 study guide identify as the largest study room in Towers West?",
+    "expected": "P-42 in Howard Plaza Towers West.",
+    "source": "study",
+    "anchors": [
+      "P-42"
+    ]
+  },
+  {
+    "question": "In the 2023 report, where was The Store @ HU and how did students visit?",
+    "expected": "The first floor of Blackburn University Center, by appointment.",
+    "source": "pantry",
+    "anchors": [
+      "first floor",
+      "appointment"
+    ]
+  },
+  {
+    "question": "Which night was the Sankofa Artivism jam, and who hosted it in October 2025?",
+    "expected": "Tuesday nights, hosted by Joshua Hughes and Isaac Alicea.",
+    "source": "artivism",
+    "anchors": [
+      "Tuesday",
+      "Joshua Hughes",
+      "Isaac Alicea"
+    ]
+  },
+  {
+    "question": "Which two dining halls accepted meal swipes in the 2026–27 report?",
+    "expected": "Blackburn Café and Bethune Annex Café.",
+    "source": "plans",
+    "anchors": [
+      "Blackburn",
+      "Bethune Annex"
+    ]
+  },
+  {
+    "question": "What was the street number of the supermarket with a dispensary in the 2022 shopping guide?",
+    "expected": "1345, the Giant Food address on Park Road NW. The article uses the word pharmacy.",
+    "source": "groceries",
+    "anchors": [
+      "1345"
+    ]
+  }
+]

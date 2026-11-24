@@ -1,122 +1,66 @@
-# Project 1 Planning: The Unofficial Guide
-
-> Write this document before you write any pipeline code.
-> Your spec and architecture diagram are what you'll use to direct AI tools (Claude, Copilot, etc.) to generate your implementation — the more specific they are, the more useful the generated code will be.
-> Update the Retrieval Approach and Chunking Strategy sections if you change your approach during implementation.
-> Update this file before starting any stretch features.
-
----
+# Planning · The Unofficial Howard Guide
 
 ## Domain
 
-<!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
-
----
+Students planning the time between classes need to know which rooms work for a group, where to buy a few groceries, and what an event actually feels like. Howard’s student newspaper reports details such as room numbers, booking practices and individual experiences across several years. The guide will answer questions about this reporting and date its citations so readers can tell when an observation was made.
 
 ## Documents
 
-<!-- List your specific sources: URLs, subreddit names, forum threads, or file descriptions.
-     Aim for at least 10 sources that together cover different subtopics or perspectives within your domain. -->
+The inputs are ten locally stored sets of paraphrased reporting notes. Each blank-line-separated passage covers one detail from the linked article. The notes preserve dates and distinguish individual experiences from general claims.
 
-| # | Source | Description | URL or location |
-|---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
-
----
+| Local source | Original student newspaper article |
+|---|---|
+| `documents/study.txt` | [Best Places to Study on Campus](https://thehilltoponline.com/2023/08/21/best-places-to-study-on-campus/) |
+| `documents/founders.txt` | [Founders Library Reveals New Study Space](https://thehilltoponline.com/2026/02/16/founders-library-reveals-new-study-space/) |
+| `documents/pantry.txt` | [New Food Pantry Aims to Tackle Food Insecurity at Howard](https://staging.thehilltoponline.com/2023/11/06/new-food-pantry-aims-to-tackle-food-insecurity-at-howard/) |
+| `documents/groceries.txt` | [Where to Shop Without Mom and Pop](https://thehilltoponline.com/2022/08/15/where-to-shop-without-mom-and-pop/) |
+| `documents/closures.txt` | [Georgia Ave Restaurant Closures Leave Students Asking: What is Left to Eat?](https://thehilltoponline.com/2025/09/08/georgia-ave-restaurant-closures-leave-students-asking-what-is-left-to-eat/) |
+| `documents/artivism.txt` | [Sankofa Hosts Weekly “Artivism” Jam Sessions](https://thehilltoponline.com/2025/10/06/sankofa-hosts-weekly-artivism-jam-sessions/) |
+| `documents/guide.txt` | [A Beginner’s Guide to Washington, D.C., According to Bison](https://thehilltoponline.com/2025/08/18/a-beginners-guide-to-washington-d-c-according-to-bison/) |
+| `documents/georgia.txt` | [Ethiopian Businesses Build Community Along Georgia Avenue](https://thehilltoponline.com/2026/08/31/ethiopian-businesses-build-community-along-georgia-avenue/) |
+| `documents/plans.txt` | [Howard Introduces New Meal Plans for 2026-27 School Year](https://thehilltoponline.com/2026/08/17/howard-introduces-new-meal-plans-for-2026-27-school-year/) |
+| `documents/aramark.txt` | [New Dining Experience: Aramark Collegiate Hospitality](https://thehilltoponline.com/2025/09/02/new-dining-experience-aramark-collegiate-hospitality/) |
 
 ## Chunking Strategy
 
-<!-- How will you split documents into chunks?
-     State your chunk size (in tokens or characters), overlap size, and explain why those
-     numbers fit the structure of your documents.
-     A review-heavy corpus warrants different chunking than a long FAQ. -->
-
-**Chunk size:**
-
-**Overlap:**
-
-**Reasoning:**
-
----
+Keep one paragraph per chunk, with a ceiling of 75 whitespace tokens and zero overlap between distinct paragraphs. A paragraph often pairs a location with its access rule. Keeping that pair together allows one citation to support both facts. For an unusually long paragraph, use windows of 75 tokens with 12 tokens of overlap to preserve terms near the boundary. Compare this strategy with 12-token, zero-overlap windows across each file.
 
 ## Retrieval Approach
 
-<!-- Which embedding model are you using (e.g., all-MiniLM-L6-v2 via sentence-transformers)?
-     How many chunks will you retrieve per query (top-k)?
-     If you were deploying this for real users and cost wasn't a constraint, what tradeoffs
-     would you weigh in choosing a different embedding model — context length, multilingual
-     support, accuracy on domain-specific text, latency? -->
-
-**Embedding model:**
-
-**Top-k:**
-
-**Production tradeoff reflection:**
-
----
+Fit a 16-dimensional latent semantic analysis (LSA) embedding using TF–IDF and truncated singular value decomposition on the source paragraphs. Save the vectors and term projection to SQLite. Rank by cosine similarity and return four passages. Local training keeps the collection reproducible, and four passages leave room for an alternative account while keeping the evidence short. For production, benchmark a pretrained sentence encoder on paraphrases, campus abbreviations and multilingual questions. Measure latency on student hardware, memory use and evidence recall before paying for a hosted model.
 
 ## Evaluation Plan
 
-<!-- List your 5 test questions with their expected correct answers.
-     Questions should be specific enough that you can judge whether the system's response
-     is right or wrong. "What are good dining halls?" is too vague.
-     "What do students say about wait times at [dining hall name] during lunch?" is testable. -->
-
-| # | Question | Expected answer |
-|---|----------|-----------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
-
----
+| Question | Ground truth |
+|---|---|
+| Which room did the 2023 study guide identify as the largest study room in Towers West? | P-42 in Howard Plaza Towers West. |
+| In the 2023 report, where was The Store @ HU and how did students visit? | The first floor of Blackburn University Center, by appointment. |
+| Which night was the Sankofa Artivism jam, and who hosted it in October 2025? | Tuesday nights, hosted by Joshua Hughes and Isaac Alicea. |
+| Which two dining halls accepted meal swipes in the 2026–27 report? | Blackburn Café and Bethune Annex Café. |
+| What was the street number of the supermarket with a dispensary in the 2022 shopping guide? | 1345, the Giant Food address on Park Road NW. The article uses the word pharmacy. |
 
 ## Anticipated Challenges
 
-<!-- What could go wrong? Name at least two specific risks with reasoning.
-     Consider: noisy or inconsistent documents, missing source attribution, off-topic
-     retrieval, chunks that split key information across boundaries. -->
-
-1.
-
-2.
-
----
+- A source might refer to a pharmacy while a visitor asks about a dispensary. A small corpus gives a learned model few chances to connect those terms.
+- Multiple articles describe Sankofa, and a story about studying there could outrank a report naming the jam hosts. Inspect rankings against passages that contain the answer.
+- Dining policies change. Preserve article dates at display time and describe historical claims as reported.
 
 ## Architecture
 
-<!-- Draw a diagram of your pipeline showing the five stages:
-     Document Ingestion → Chunking → Embedding + Vector Store → Retrieval → Generation
-     Label each stage with the tool or library you're using.
-     You can use ASCII art, a Mermaid diagram, or embed a sketch as an image.
-     You'll use this diagram as context when prompting AI tools to implement each stage. -->
-
----
+```mermaid
+flowchart TD
+ A["Ingest notes · Python pathlib"] --> B["Split paragraphs · Python"]
+ B --> C["Embed · NumPy LSA and SQLite vector store"]
+ C --> D["Retrieve · cosine and BM25"]
+ Q["Question and source filter"] --> D
+ D --> E["Generate · grounded LLM with citation validation"]
+ E --> F["Display answer · Python CLI"]
+```
 
 ## AI Tool Plan
 
-<!-- For each part of the pipeline below, describe:
-     - Which AI tool you plan to use (Claude, Copilot, ChatGPT, etc.)
-     - What you'll give it as input (which sections of this planning.md, which requirements)
-     - What you expect it to produce
-     - How you'll verify the output matches your spec
+Use ChatGPT to implement the tokenizer and chunker from the size and overlap rules above. Check a long paragraph and inspect five stored passages. Use the retrieval specification to build cosine ranking and trace a returned ID back to its article. For generation, provide the ranked chunks and require evidence IDs that can be resolved to the original URLs. Test a question about an unrelated subject.
 
-     "I'll use AI to help me code" is not a plan.
-     "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
-     with my specified chunk size and overlap" is a plan. -->
+## Stretch work
 
-**Milestone 3 — Ingestion and chunking:**
-
-**Milestone 4 — Embedding and retrieval:**
-
-**Milestone 5 — Generation and interface:**
+Before implementing the extensions, compare semantic-only, BM25 and hybrid retrieval on the same questions. Compare both chunkers against the same evidence requirements. Expose a source filter, and use the most recent cited source for explicit follow-ups. Run a fresh-session control for memory.
